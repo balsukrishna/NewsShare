@@ -1,0 +1,10 @@
+/build/
+/bin/
+.classpath
+.gradle/
+.project
+gradle/
+gradlew
+gradlew.bat
+settings.gradle
+
