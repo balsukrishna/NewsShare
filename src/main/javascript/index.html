@@ -5,12 +5,27 @@
 
     <body>
     <script type="text/javascript">
+        //Initiate WS
         var socket;
         socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/websocket");
         socket.onmessage = function(event) {
             console.log(event.data);   
         };
+
+        function send(message) {
+            //No Socket support ,No Action
+            if (!window.WebSocket) { return; }
+            if (socket.readyState == WebSocket.OPEN) {
+                socket.send(message);
+            } else {
+                alert("The socket is not yet open.");
+            }
+        }
     </script>
     </body>
-
+     
+    <form onsubmit="return false;">
+    <input type="text" name="topic" value="Hello, World!"/>
+    <input type="button" value="Submit" onclick="send(this.form.topic.value)" />
+                
 </html>
