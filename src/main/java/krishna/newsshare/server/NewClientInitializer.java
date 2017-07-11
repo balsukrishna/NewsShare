@@ -1,5 +1,15 @@
 package krishna.newsshare.server;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -14,12 +24,50 @@ import io.netty.handler.codec.http.HttpServerCodec;
  */
 @Sharable
 public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
-
-    @Override
+	private static final Logger log  = LoggerFactory.getLogger(NewClientInitializer.class);
+	private static final String INDEX_PAGE = "src/main/javascript/index.html";
+	private String indexContent;
+	
+	public NewClientInitializer() {
+		//Load index page for first connection
+		if(indexContent == null) {
+			indexContent = readIndexPage();
+		}
+	}
+	
+	@Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
-        pipeline.addLast(new WebSocketServerHandler());
+        pipeline.addLast(new WebSocketServerHandler(indexContent));
     }
+	
+    private String readIndexPage() {
+    	BufferedReader buf = null;
+    	try {
+    		InputStream is = new FileInputStream(INDEX_PAGE);
+        	buf = new BufferedReader(new InputStreamReader(is));
+        	String line = buf.readLine();
+        	StringBuilder sb = new StringBuilder();
+        	while(line != null){
+        		sb.append(line).append("\n");
+        		line = buf.readLine();
+        	}
+        	String fileAsString = sb.toString(); 
+        	return fileAsString;
+    	} catch(Exception ex) {
+    		log.error("Error while reading index page",ex);
+    	} finally {
+    		if(buf != null) {
+    			try {
+					buf.close();
+				} catch (IOException e) {
+					log.error("",e);
+				}
+    		}
+    	}
+    	//Return Default
+    	return "<html><head><title>NewsShare Server Error!</title></head>";
+	}
 }

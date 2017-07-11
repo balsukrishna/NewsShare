@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <title>NewsShare</title>
+    </head>
+
+    <body>
+    <script type="text/javascript">
+        var socket;
+        socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/websocket");
+        socket.onmessage = function(event) {
+            console.log(event.data);   
+        };
+    </script>
+    </body>
+
+</html>

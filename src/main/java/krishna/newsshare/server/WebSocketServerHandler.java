@@ -33,12 +33,14 @@ import static io.netty.handler.codec.http.HttpVersion.*;
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketServerHandler.class);
-	
-    private static final String WEBSOCKET_PATH = "/websocket";
-
     private WebSocketServerHandshaker handshaker;
 
-    @Override
+    private String index;
+    public WebSocketServerHandler(String indexContent) {
+    	this.index = indexContent;
+	}
+
+	@Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
@@ -50,7 +52,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) {
 
         if ("/".equals(req.uri())) {
-            ByteBuf content = WebSocketServerIndexPage.getContent(getWebSocketLocation(req));
+            ByteBuf content = Unpooled.copiedBuffer(index.getBytes());
             FullHttpResponse res = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
 
             res.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
@@ -62,7 +64,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Handshake
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                getWebSocketLocation(req), null, true);
+                req.uri(), null, true);
         handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
@@ -132,10 +134,5 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
-    }
-
-    private static String getWebSocketLocation(FullHttpRequest req) {
-        String location =  req.headers().get(HttpHeaderNames.HOST) + WEBSOCKET_PATH;
-        return "ws://" + location;
     }
 }
