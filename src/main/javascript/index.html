@@ -29,7 +29,7 @@
     <body>
         <form onsubmit="return false;">
             <input id="topicText" class="topic" value="dog">
-    	    <button id="topicBtn" class="topicButton" onclick="reload()">submit</button>
+    	    <button id="topicBtn" class="topicButton" onclick="sendTopic(this.form.topicText.value)">submit</button>
         </form>
 
     	<table id="topTable"  border="1"> </table> 
@@ -41,23 +41,45 @@
         
         var socket;
         function connect() {
-            socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/websocket");
+            socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/voteFeed");
             socket.onmessage = function(event) {
-                console.log(event.data);   
+                console.log(event.data);
             };
         }
+
+        
 
         function send(message) {
             //No Socket support ,No Action
             if (!window.WebSocket) { return; }
             if (socket.readyState == WebSocket.OPEN) {
-                socket.send(message);
+                text = JSON.stringify(message);
+                socket.send(text);
             } else {
                 alert("The socket is not yet open.");
             }
         }
+
+        function sendTopic(topic) {
+            data = {};
+            data.TOPIC =  topic
+            send(data);         
+        }
+
+        function sendUpvote(topic) {
+           data = {};
+           data.UPVOTE =  topic;
+           send(data);
+        }
         
-        //DOM Manipulation
+        function sendDownvote(topic) {
+            data = {};
+            data.DOWNVOTE = downvote;
+            send(data);
+        }
+        
+        
+        //DOM Manipulation functions
         
         function reload() {
             var json = {};
@@ -97,9 +119,9 @@
 				var cell3 = row.insertCell(2);
 				var cell4 = row.insertCell(3);
 
-				cell1.appendChild(upButton);	
-                cell2.innerHTML = keys[i];    
-				cell3.appendChild(votes);
+                cell1.innerHTML = keys[i];    
+				cell2.appendChild(votes);
+				cell3.appendChild(upButton);	
 				cell4.appendChild(downButton);
             }
         }
@@ -135,6 +157,10 @@
             keys.sort(function(a,b){return json[a] - json[b]});
             return keys
         }
+
+        //Startup calls
+        connect();
+         
 
     </script>
      
