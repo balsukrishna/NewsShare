@@ -32,12 +32,13 @@
     	    <button id="topicBtn" class="topicButton" onclick="reload()">submit</button>
         </form>
 
-    	<table id="top20"  border="1"> </table> 
+    	<table id="topTable"  border="1"> </table> 
     </body>
 
     <script type="text/javascript">
-    
-        //Initiate WS
+        
+        //IO functions 
+        
         var socket;
         function connect() {
             socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/websocket");
@@ -55,18 +56,27 @@
                 alert("The socket is not yet open.");
             }
         }
+        
+        //DOM Manipulation
+        
+        function reload() {
+            var json = {};
+            for(i = 0; i < 20; i++) {
+                  json[genRandText()] = genRandNum();
+            }
+            
+            redraw(json)
+        }
 
-    	function genRand(){
-			return Math.floor((Math.random() * 100) + 1);
-		}
 
-		function reload()   {
-			var top20    = document.getElementById("top20");
-			while(top20.rows.length > 0) {
-			  top20.deleteRow(0);
+        function redraw(topTopics) {
+            var topTable    = document.getElementById("topTable");
+			while(topTable.rows.length > 0) {
+			  topTable.deleteRow(0);
 			}
-
-			for(i = 0; i < 10; i++) {
+            
+            keys = getSortedKeys(topTopics)   
+			for(i = 0; i < keys.length; i++) {
 				
 				var upButton = document.createElement("button");
 				upButton.innerHTML = "upvote";
@@ -77,24 +87,54 @@
 				downButton.className = "voteButton"
 
 				var votes = document.createElement("span");
-				votes.innerHTML = genRand();
+				votes.innerHTML = topTopics[keys[i]]
 				votes.className = "votes"
 
 				//Create rown and add columns
-				var row = top20.insertRow(i);	
+				var row = topTable.insertRow(i);	
 				var cell1 = row.insertCell(0);
 				var cell2 = row.insertCell(1);
 				var cell3 = row.insertCell(2);
 				var cell4 = row.insertCell(3);
 
 				cell1.appendChild(upButton);	
-                cell2.innerHTML = "Topic";    
+                cell2.innerHTML = keys[i];    
 				cell3.appendChild(votes);
 				cell4.appendChild(downButton);
-                
-			}
-
+            }
+        }
+        
+        //Util Functions
+    
+        //Return Random number between 1 and 100
+    	function genRandNum() {
+			return Math.floor((Math.random() * 100) + 1);
 		}
+       
+        //Returns Random text of length 5 
+        function genRandText() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                        
+            for (var i = 0; i < 5; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text; 
+        }
+        
+        //Retun keys sorted according to value
+        //All values are expected to be numberic
+        //Input: {a: 4,b: 3}
+        //Output: [b,a]
+		function getSortedKeys(json) {
+            var keys = [];
+            //Get all keys
+            for(var k in json) keys.push(k); 
+
+            //Sort the keys by comparing respective values
+            keys.sort(function(a,b){return json[a] - json[b]});
+            return keys
+        }
 
     </script>
      
