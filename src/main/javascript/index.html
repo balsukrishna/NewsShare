@@ -36,9 +36,14 @@
     </body>
 
     <script type="text/javascript">
-        
-        //IO functions 
-        
+
+        var constants = {};
+        constants.UPVOTE = "UPVOTE";
+        constants.DOWNVOTE = "DOWNVOTE";       
+        constants.TOPIC = "TOPIC";
+        constants.SEPARATOR = "_";
+
+        //IO functions         
         var socket;
         function connect() {
             socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/voteFeed");
@@ -62,22 +67,19 @@
 
         function sendTopic(topic) {
             data = {};
-            data.TOPIC =  topic
+            data[constants.TOPIC] =  topic
             send(data);         
         }
 
-        function sendUpvote(topic) {
+        //Expected input
+        //UPVOTE_TOPIC or DOWNVOTE_TOPIC
+        function sendVote(voteAndTopic) {
            data = {};
-           data.UPVOTE =  topic;
+           topic = voteAndTopic.substring(voteAndTopic.indexOf(constants.SEPARATOR)+1);
+           vote = voteAndTopic.split(constants.SEPARATOR)[0];
+           data[vote] =  topic;
            send(data);
         }
-        
-        function sendDownvote(topic) {
-            data = {};
-            data.DOWNVOTE = downvote;
-            send(data);
-        }
-        
         
         //DOM Manipulation functions
         
@@ -100,16 +102,21 @@
             keys = getSortedKeys(topTopics)   
 			for(i = 0; i < keys.length; i++) {
 				
+                topic = keys[i];
+                count = topTopics[topic];
+
 				var upButton = document.createElement("button");
 				upButton.innerHTML = "upvote";
 				upButton.className = "voteButton"
+                attachVoteListener(constants.UPVOTE,topic,upButton);
 
 				var downButton = document.createElement("button");
 				downButton.innerHTML = "downvote";
 				downButton.className = "voteButton"
+                attachVoteListener(constants.DOWNVOTE,topic,downButton);
 
 				var votes = document.createElement("span");
-				votes.innerHTML = topTopics[keys[i]]
+				votes.innerHTML = count;
 				votes.className = "votes"
 
 				//Create rown and add columns
@@ -119,12 +126,20 @@
 				var cell3 = row.insertCell(2);
 				var cell4 = row.insertCell(3);
 
-                cell1.innerHTML = keys[i];    
+                cell1.innerHTML = topic;    
 				cell2.appendChild(votes);
 				cell3.appendChild(upButton);	
 				cell4.appendChild(downButton);
             }
         }
+
+        function attachVoteListener(voteType,topic,button) {
+            button.id = voteType + constants.SEPARATOR + topic  
+            button.addEventListener("click", function (){
+                    sendVote(button.id);
+                });
+        }
+ 
         
         //Util Functions
     
