@@ -64,7 +64,8 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
                 WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             } else {
                 ChannelFuture complete = handshaker.handshake(ctx.channel(), req);
-                attachPeriodicPinger(complete);
+                triggerNewWSEvent(complete);
+                //attachPeriodicPinger(complete);
             }
             ctx.fireUserEventTriggered(handshaker);
         } else {
@@ -82,6 +83,22 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
 
 
     }
+    
+    public static class NewWSEvent {}
+
+	private void triggerNewWSEvent(ChannelFuture future) {
+		future.addListener(new ChannelFutureListener() {
+
+			@Override
+			public void operationComplete(ChannelFuture future)
+					throws Exception {
+				//Trigger a new WS Event
+				if (future.isSuccess()) {
+					future.channel().pipeline().fireUserEventTriggered(new NewWSEvent());
+				}
+			}
+		});
+	}
     
     private void attachPeriodicPinger(ChannelFuture future) {
     	future.addListener(new ChannelFutureListener() {

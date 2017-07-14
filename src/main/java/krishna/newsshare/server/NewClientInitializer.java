@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import krishna.newsshare.datastructure.TopicRepo;
 import krishna.newsshare.datastructure.TopicRepoImpl;
 
 import org.slf4j.Logger;
@@ -29,11 +28,11 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
 	private static final Logger log  = LoggerFactory.getLogger(NewClientInitializer.class);
 	private static final String INDEX_PAGE = "src/main/javascript/index.html";
 	private String indexContent;
-	private TopicRepo topicRepo;
+	private UpdateCommitter updateCommitter;
 	
 	public NewClientInitializer() {
 		indexContent = readIndexPage();
-		topicRepo = new TopicRepoImpl();
+		updateCommitter = new UpdateCommitter(new TopicRepoImpl());
 	}
 	
 	@Override
@@ -43,7 +42,7 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new RequestUpgrader(indexContent));
         pipeline.addLast(new WSFrameHandler());
-        pipeline.addLast(new UpdateCommitter(topicRepo));
+        pipeline.addLast(updateCommitter);
     }
 	
     private String readIndexPage() {

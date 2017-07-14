@@ -52,6 +52,8 @@
             socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/voteFeed");
             socket.onmessage = function(event) {
                 console.log(event.data);
+                json = JSON.parse(event.data);
+                redraw(json);
             };
         }
 

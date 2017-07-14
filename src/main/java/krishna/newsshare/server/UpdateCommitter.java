@@ -1,18 +1,32 @@
 package krishna.newsshare.server;
 
+import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 import krishna.newsshare.datastructure.TopicRepo;
 import krishna.newsshare.datastructure.Update;
 import krishna.newsshare.datastructure.Update.UpdateType;
+import krishna.newsshare.datastructure.VotedTopic;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 @Sharable
 public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
+	private static final int NO_OF_TOPICS = 20;
 	private TopicRepo topicRepo;
+	private ChannelGroup sockets;
 	
 	public UpdateCommitter(TopicRepo tr) {
 		this.topicRepo = tr;
+		this.sockets = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 	}
 	
 	
@@ -26,6 +40,37 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 		} else if(msg.getUpdateType() == UpdateType.DOWNVOTE) {
 			topicRepo.downvoteTopic(msg.getName());
 		}
+		sendTopTopics();
 	}
 
+
+	@Override
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
+			throws Exception {
+		if(evt instanceof RequestUpgrader.NewWSEvent) {
+			//Add this socket to channel
+			sockets.add(ctx.channel());
+		} else {
+			ctx.fireUserEventTriggered(evt);
+		}
+		
+	}
+	
+	private void sendTopTopics() {
+		List<VotedTopic> list = topicRepo.getTopTopics(NO_OF_TOPICS);
+		String json = convertToJson(list);
+		System.out.println("Sending " + json);
+		TextWebSocketFrame frame = new TextWebSocketFrame(json);
+		sockets.writeAndFlush(frame);
+	}
+	
+	private String convertToJson(List<VotedTopic> votedTopicList) {
+		JsonObject obj = new JsonObject();
+		for(VotedTopic topic : votedTopicList) {
+			obj.addProperty(topic.getTopic(), topic.getVotes());
+		}
+		return obj.toString();
+	}
+
+	
 }
