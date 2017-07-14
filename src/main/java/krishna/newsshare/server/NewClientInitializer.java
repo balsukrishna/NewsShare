@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import krishna.newsshare.datastructure.TopicRepo;
+import krishna.newsshare.datastructure.TopicRepoImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -27,12 +29,11 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
 	private static final Logger log  = LoggerFactory.getLogger(NewClientInitializer.class);
 	private static final String INDEX_PAGE = "src/main/javascript/index.html";
 	private String indexContent;
+	private TopicRepo topicRepo;
 	
 	public NewClientInitializer() {
-		//Load index page for first connection
-		if(indexContent == null) {
-			indexContent = readIndexPage();
-		}
+		indexContent = readIndexPage();
+		topicRepo = new TopicRepoImpl();
 	}
 	
 	@Override
@@ -42,6 +43,7 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new RequestUpgrader(indexContent));
         pipeline.addLast(new WSFrameHandler());
+        pipeline.addLast(new UpdateCommitter(topicRepo));
     }
 	
     private String readIndexPage() {
