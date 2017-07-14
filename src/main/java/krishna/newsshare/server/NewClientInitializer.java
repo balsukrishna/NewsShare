@@ -40,7 +40,8 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
-        pipeline.addLast(new WebSocketServerHandler(indexContent));
+        pipeline.addLast(new RequestUpgrader(indexContent));
+        pipeline.addLast(new WSFrameHandler());
     }
 	
     private String readIndexPage() {
