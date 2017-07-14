@@ -1,5 +1,13 @@
 package krishna.newsshare.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+
+import krishna.newsshare.datastructure.Update;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
@@ -10,7 +18,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
-
+	private static Logger log = LoggerFactory.getLogger(WSFrameHandler.class);
 	private WebSocketServerHandshaker handshaker;
 
 	@Override
@@ -39,6 +47,10 @@ public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 		// Send the uppercase string back.
 		String request = ((TextWebSocketFrame) frame).text();
 		System.err.printf("%s received %s%n", ctx.channel(), request);
+		Update update = convertIncomingToUpdate(request);
+		if(update != null) {
+			ctx.fireChannelRead(update);
+		}
 	}
 
 	@Override
@@ -53,6 +65,29 @@ public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 		}
 	}
 	
+	protected Update convertIncomingToUpdate(String json) {
+		Update update = null;
+		try {
+			Gson gson = new GsonBuilder().create();
+			update = gson.fromJson(json,Update.class);
+		} catch(JsonSyntaxException ex) {
+			log.error("Error converting {} to valid json",json,ex);
+		}
+		return validate(update);
+	}
+	
+	private Update validate(Update update) {
+		if(update == null) {
+			return null;
+		}
+		if(update.getName() == null|| update.getName().isEmpty()) {
+			return null;
+		}
+		if(update.getUpdateType() == null) {
+			return null;
+		}
+		return update;
+	}
 	
 
 }

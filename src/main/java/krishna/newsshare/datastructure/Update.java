@@ -8,19 +8,19 @@ package krishna.newsshare.datastructure;
 public class Update {
 	
 	private final UpdateType updateType;
-	private final String topic;
+	private final String name;
 	
 	public Update(String topic,UpdateType type) {
 		this.updateType = type;
-		this.topic = topic;
+		this.name = topic;
 	}
 
 	public UpdateType getUpdateType() {
 		return updateType;
 	}
 
-	public String getTopic() {
-		return topic;
+	public String getName() {
+		return name;
 	}
 	
 	public static enum UpdateType {
