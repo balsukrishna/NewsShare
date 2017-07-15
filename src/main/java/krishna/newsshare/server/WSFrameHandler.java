@@ -76,11 +76,15 @@ public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 		return validate(update);
 	}
 	
+	private static final int TOPIC_MAX_LENGTH = 255;
 	private Update validate(Update update) {
 		if(update == null) {
 			return null;
 		}
 		if(update.getName() == null|| update.getName().isEmpty()) {
+			return null;
+		}
+		if(update.getName().length() > TOPIC_MAX_LENGTH) {
 			return null;
 		}
 		if(update.getUpdateType() == null) {

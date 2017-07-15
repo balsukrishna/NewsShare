@@ -28,7 +28,7 @@
 
     <body>
         <form onsubmit="return false;">
-            <input id="topicText" class="topic" value="dog">
+            <input id="topicText" class="topic" maxlength="255" value="dog">
     	    <button id="topicBtn" class="topicButton" onclick="sendTopic(this.form.topicText.value)">submit</button>
         </form>
 
