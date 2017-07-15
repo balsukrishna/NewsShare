@@ -48,7 +48,7 @@ public class TopicRepoImpl implements TopicRepo {
 	public void upvoteTopic(String topic) {
 		VotedTopicImpl vt = topicMap.get(topic);
 		if(vt != null) {
-			vt.incrementVote();
+			vt.incrementUpvote();
 		}
 	}
 
@@ -56,7 +56,7 @@ public class TopicRepoImpl implements TopicRepo {
 	public void downvoteTopic(String topic) {
 		VotedTopicImpl vt = topicMap.get(topic);
 		if(vt != null) {
-			vt.decrementVote();
+			vt.incrementDownvote();
 		}
 	}
 	

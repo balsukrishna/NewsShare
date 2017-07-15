@@ -3,27 +3,35 @@ package krishna.newsshare.datastructure;
 public class VotedTopicImpl implements VotedTopic {
 	
 	private final String topic;
-	private int votes;
+	private int upvotes;
+	private int downvotes; 
 	 
 	public VotedTopicImpl(String topic) {
 		this.topic = topic;
-		this.votes = 0;
+		this.upvotes = 0;
+		this.downvotes = 0;
 	}
 	
 	public String getTopic() {
 		return topic;
 	}
 	
-	public int getVotes() {
-		return votes;
+	public int getUpvotes() {
+		return upvotes;
 	}
 	
-	public void incrementVote() {
-		votes++;
+	public void incrementUpvote() {
+		upvotes++;
 	}
 
-	public void decrementVote() {
-		votes--;
+	public void incrementDownvote() {
+		downvotes++;
+	}
+
+
+	@Override
+	public int getDownvotes() {
+		return downvotes;
 	}
 	
 }

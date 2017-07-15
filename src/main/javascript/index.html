@@ -91,10 +91,13 @@
         
         //DOM Manipulation functions
         
-        function reload() {
+        function drawDummyTable() {
             var json = {};
             for(i = 0; i < 20; i++) {
-                  json[genRandText()] = genRandNum();
+                  votes = [];
+                  votes[0] = genRandNum();
+                  votes[1] = genRandNum();
+                  json[genRandText()] = votes;
             }
             
             redraw(json)
@@ -111,7 +114,7 @@
 			for(i = 0; i < keys.length; i++) {
 				
                 topic = keys[i];
-                count = topTopics[topic];
+                votesArr = topTopics[topic];
 
 				var upButton = document.createElement("button");
 				upButton.innerHTML = "upvote";
@@ -123,21 +126,27 @@
 				downButton.className = "voteButton"
                 attachVoteListener(constants.DOWNVOTE,topic,downButton);
 
-				var votes = document.createElement("span");
-				votes.innerHTML = count;
-				votes.className = "votes"
+				var upvotes = document.createElement("span");
+				upvotes.innerHTML = votesArr[0];
+				upvotes.className = "votes"
 
-				//Create rown and add columns
+				var downvotes = document.createElement("span");
+				downvotes.innerHTML =votesArr[1];
+				downvotes.className = "votes"
+
+				//Create row and add columns
 				var row = topTable.insertRow(i);	
-				var cell1 = row.insertCell(0);
-				var cell2 = row.insertCell(1);
-				var cell3 = row.insertCell(2);
-				var cell4 = row.insertCell(3);
+				var topicCell = row.insertCell(0);
+				var upvotesCell = row.insertCell(1);
+				var upvoteBtnCell = row.insertCell(2);
+				var downvotesCell = row.insertCell(3);
+                var downvoteBtnCell = row.insertCell(4);
 
-                cell1.innerHTML = topic;    
-				cell2.appendChild(votes);
-				cell3.appendChild(upButton);	
-				cell4.appendChild(downButton);
+                topicCell.innerHTML = topic;    
+				upvotesCell.appendChild(upvotes);
+				upvoteBtnCell.appendChild(upButton);	
+				downvotesCell.appendChild(downvotes);
+				downvoteBtnCell.appendChild(downButton);
             }
         }
 
@@ -161,7 +170,7 @@
             var text = "";
             var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
                         
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 15; i++) {
                 text += possible.charAt(Math.floor(Math.random() * possible.length));
             }
             return text; 

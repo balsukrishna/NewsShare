@@ -2,8 +2,7 @@ package krishna.newsshare.server;
 
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import krishna.newsshare.datastructure.TopicRepo;
@@ -67,7 +66,10 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	private String convertToJson(List<VotedTopic> votedTopicList) {
 		JsonObject obj = new JsonObject();
 		for(VotedTopic topic : votedTopicList) {
-			obj.addProperty(topic.getTopic(), topic.getVotes());
+			JsonArray votes = new JsonArray();
+			votes.add(topic.getUpvotes());
+			votes.add(topic.getDownvotes());
+			obj.add(topic.getTopic(), votes);
 		}
 		return obj.toString();
 	}
