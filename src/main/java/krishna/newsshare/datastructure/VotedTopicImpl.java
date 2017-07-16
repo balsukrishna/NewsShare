@@ -20,10 +20,16 @@ public class VotedTopicImpl implements VotedTopic {
 		return upvotes;
 	}
 	
+	/**
+	 * Increments upvote by 1
+	 */
 	public void incrementUpvote() {
 		upvotes++;
 	}
 
+	/**
+	 * Increments downvote by 1
+	 */
 	public void incrementDownvote() {
 		downvotes++;
 	}

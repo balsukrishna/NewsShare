@@ -2,6 +2,9 @@ package krishna.newsshare.server;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -18,10 +21,22 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
+/**
+ * A Single UpdateCommitter is added to all the channel's pipeline.
+ * This should be thread-safe or guranteed to be accessed by one thread
+ * @author krishna
+ *
+ */
 @Sharable
 public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
+	private static Logger log  = LoggerFactory.getLogger(UpdateCommitter.class);
 	private static final int NO_OF_TOPICS = 20;
 	private TopicRepo topicRepo;
+	
+	/**
+	 * Channelgroup encapsualtes all existing WS connections.
+	 * It will auto remove disconnected channels from channelgroup
+	 */
 	private ChannelGroup sockets;
 	
 	public UpdateCommitter(TopicRepo tr) {
@@ -48,7 +63,8 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
 			throws Exception {
 		if(evt instanceof RequestUpgrader.NewWSEvent) {
-			//Add this socket to channel
+			//Add this socket to channelgroup
+			log.info("Receied new WS Connection {}.Sending top topics",ctx.channel());
 			sockets.add(ctx.channel());
 			sendFirstMessage(ctx.channel());
 		} else {
@@ -67,7 +83,7 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	private void sendTopTopics() {
 		List<VotedTopic> list = topicRepo.getTopTopics(NO_OF_TOPICS);
 		String json = convertToJson(list);
-		System.out.println("Sending " + json);
+		log.trace("Sending " + json);
 		TextWebSocketFrame frame = new TextWebSocketFrame(json);
 		sockets.writeAndFlush(frame);
 	}

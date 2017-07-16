@@ -17,6 +17,14 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
+/**
+ * WSFrame handler is reponsible for validating received frames and deserializing
+ * it's content to {@link Update}
+ * <br>
+ * It is also reponsible for closing channels upon receiving close frames
+ * @author krishna
+ *
+ */
 public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 	private static Logger log = LoggerFactory.getLogger(WSFrameHandler.class);
 	private WebSocketServerHandshaker handshaker;
@@ -46,7 +54,7 @@ public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 
 		// Send the uppercase string back.
 		String request = ((TextWebSocketFrame) frame).text();
-		System.err.printf("%s received %s%n", ctx.channel(), request);
+		log.trace("Received {} from {}", ctx.channel(), request);
 		Update update = convertIncomingToUpdate(request);
 		if(update != null) {
 			ctx.fireChannelRead(update);

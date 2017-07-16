@@ -11,6 +11,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+/**
+ * Initializes the server on port 8080
+ * @author krishna
+ *
+ */
 public class ServerInitializer {
     static final int PORT = 8080;
     private static final Logger log = LoggerFactory.getLogger(ServerInitializer.class);

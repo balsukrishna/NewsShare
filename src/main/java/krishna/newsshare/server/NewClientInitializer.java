@@ -19,7 +19,11 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
 /**
- * Initializes and setup pipeline for every new connection
+ * This is the first handler that is triggered for every new connection. <br>
+ * This is a sharable handler and used among different channels. 
+ * Thus should be thread-safe.
+ * <br>
+ * <b>Responsibility:</b> Initializes and setup pipeline for every new connection
  * @author krishna
  *
  */

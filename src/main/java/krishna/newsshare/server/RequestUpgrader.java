@@ -25,7 +25,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 
 /**
- * Handles handshakes and messages
+ * A new Request Upgrader is added to every channel's pipeline <br>
+ * <b>Responsibility:</b>: <br>
+ *  1. For HomePage uri,Return a html containing index <br> 
+ *  2. For voteFeed uri(expected to have upgrade header),upgrage to WS Connection,
+ *  	Trigger an handShake event <br>
+ *  3. For Other uri, return empty 200 response
+ * @author krishna
+ *
  */
 public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest> {
 	private static final Logger log = LoggerFactory.getLogger(RequestUpgrader.class);
@@ -45,7 +52,7 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
     }
 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) {
-
+    	//If home page, Send  index
         if ("/".equals(req.uri())) {
             ByteBuf content = Unpooled.copiedBuffer(index.getBytes());
             FullHttpResponse res = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
@@ -55,6 +62,7 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
 
             sendHttpResponse(ctx, req, res);
             return;
+        //If votefeed upgrade
         } else if(WS_PATH.equals(req.uri())) {
             // Handshake
             WebSocketServerHandshakerFactory wsFactory = 
@@ -64,7 +72,7 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
                 WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             } else {
                 ChannelFuture complete = handshaker.handshake(ctx.channel(), req);
-                triggerNewWSEvent(complete);
+                addListenerToTriggerNewWSEvent(complete);
                 //attachPeriodicPinger(complete);
             }
             ctx.fireUserEventTriggered(handshaker);
@@ -84,9 +92,20 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
 
     }
     
+    /**
+     * Event which indicates connection upgrade to 
+     * WS is complete
+     * @author krishna
+     *
+     */
     public static class NewWSEvent {}
 
-	private void triggerNewWSEvent(ChannelFuture future) {
+	/**
+	 * Add a listener, which , if future is success, trigger 
+	 * {@link #NewWSEvent} event
+	 * @param future
+	 */
+	private void addListenerToTriggerNewWSEvent(ChannelFuture future) {
 		future.addListener(new ChannelFutureListener() {
 
 			@Override
@@ -100,6 +119,11 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
 		});
 	}
     
+    /**
+     * Add a listener, which , if future is success,
+     * sends epoch as text frame periodically to connection 
+     * @param future
+     */
     private void attachPeriodicPinger(ChannelFuture future) {
     	future.addListener(new ChannelFutureListener() {
 			
@@ -118,7 +142,7 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
     
 
    
-    private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res) {
+    private void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res) {
     	
         // Generate an error page if response getStatus code is not OK (200).
         if (res.status().code() != 200) {
@@ -137,7 +161,7 @@ public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+    	log.error("Error. Closing channel",cause);
         ctx.close();
     }
 }

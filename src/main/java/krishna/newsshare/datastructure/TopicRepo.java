@@ -2,17 +2,25 @@ package krishna.newsshare.datastructure;
 
 import java.util.List;
 
+/**
+ * Topic Repo is single place where all the topics and votes are stored.
+ * It is not thread-safe.
+ * 
+ * It also provides methods to read/write repo
+ * @author krishna
+ *
+ */
 public interface TopicRepo {
 
 	/**
-	 * Returns top n topics ordered by votes desc 
+	 * Returns top n topics ordered by upvotes desc 
 	 * @param n
 	 */
 	public List<VotedTopic> getTopTopics(int n);
 	
 	
 	/**
-	 * Add topic to repo. No action if topic already added
+	 * Add topic to repo. No action if topic already exists
 	 * @param topic
 	 */
 	public void addTopic(String topic);
