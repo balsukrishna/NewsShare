@@ -15,7 +15,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  *
  */
 public class ServerInitializer {
-    static final int PORT = 8080;
+    static final int PORT = 80;
     private static final Logger log = LoggerFactory.getLogger(ServerInitializer.class);
 
     public static void main(String[] args) throws Exception {

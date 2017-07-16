@@ -53,13 +53,12 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 			throws Exception {
 		if(msg.getUpdateType() == UpdateType.TOPIC) {
 			topicRepo.addTopic(msg.getName());
-			sendTopTopics();
 		} else if(msg.getUpdateType() == UpdateType.UPVOTE) {
 			topicRepo.upvoteTopic(msg.getName());
-			sendTopTopics();
 		} else if(msg.getUpdateType() == UpdateType.DOWNVOTE) {
 			topicRepo.downvoteTopic(msg.getName());
 		}
+		sendTopTopics();
 	}
 
 

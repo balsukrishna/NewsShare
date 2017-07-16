@@ -66,6 +66,8 @@ public class UpdateCommitterTest {
 		
 		//Make sure,topic repo is updated
 		Mockito.verify(repo,Mockito.times(1)).downvoteTopic(newTopic.getName());
+		//Make sure, it gets top topics and send message
+		Mockito.verify(repo,Mockito.times(1)).getTopTopics();
 		//Make sure no other method is called
 		Mockito.verifyNoMoreInteractions(repo);
 	}
