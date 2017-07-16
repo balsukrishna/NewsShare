@@ -10,7 +10,7 @@
 - Built using [Gradle](https://gradle.org/)
 
 ```
-$ git clone TODO
+$ git clone https://github.com/balsukrishna/NewsShare.git
 $ cd  NewsShare
 $ gradle clean builf
 ```
@@ -25,7 +25,8 @@ $ gradle clean builf
 ### Architecture
    **Client Server Interaction**
     - Browsing `/` initates a websocket connection to `/voteFeed`
-    - Two types of messages exchanged between server and client
+    - Two types of messages exchanged between server and client  
+    
        + UPDATE: Sent from Client to Server
             ```
                 {
