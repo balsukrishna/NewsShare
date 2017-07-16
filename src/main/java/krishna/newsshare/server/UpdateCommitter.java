@@ -9,6 +9,7 @@ import krishna.newsshare.datastructure.TopicRepo;
 import krishna.newsshare.datastructure.Update;
 import krishna.newsshare.datastructure.Update.UpdateType;
 import krishna.newsshare.datastructure.VotedTopic;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -49,10 +50,18 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 		if(evt instanceof RequestUpgrader.NewWSEvent) {
 			//Add this socket to channel
 			sockets.add(ctx.channel());
+			sendFirstMessage(ctx.channel());
 		} else {
 			ctx.fireUserEventTriggered(evt);
 		}
 		
+	}
+	
+	private void sendFirstMessage(Channel ch) {
+		List<VotedTopic> list = topicRepo.getTopTopics(NO_OF_TOPICS);
+		String json = convertToJson(list);
+		TextWebSocketFrame frame = new TextWebSocketFrame(json);
+		ch.writeAndFlush(frame);
 	}
 	
 	private void sendTopTopics() {
