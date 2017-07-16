@@ -40,8 +40,8 @@ public class WSFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			return;
 		}
 		if (!(frame instanceof TextWebSocketFrame)) {
-			throw new UnsupportedOperationException(String.format(
-					"%s frame types not supported", frame.getClass().getName()));
+			log.warn("Frame not a TextWebSocketFrame {}. Ignoring",frame);
+			return;
 		}
 
 		// Send the uppercase string back.
