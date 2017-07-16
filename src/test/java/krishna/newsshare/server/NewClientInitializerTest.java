@@ -9,6 +9,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,14 +37,14 @@ public class NewClientInitializerTest {
 		
 		//Make sure all handlers are added to pipeline on correct order 
 		//codec,aggregator,upgrader,wsframehandler and updatecommitter in same order
-		Mockito.verify(pipeline,Mockito.times(5)).addLast(handlerCapture.capture());
+		Mockito.verify(pipeline,Mockito.times(4)).addLast(handlerCapture.capture());
 		List<ChannelHandler> handlers = handlerCapture.getAllValues();
 		assertTrue(handlers.get(0) instanceof HttpServerCodec);
 		assertTrue(handlers.get(1) instanceof HttpObjectAggregator);
 		assertTrue(handlers.get(2) instanceof HttpRequestHandler);
 		assertTrue(handlers.get(3) instanceof WSFrameHandler);
-		assertTrue(handlers.get(4) instanceof UpdateCommitter);
 	}
+	
 	
 	@Test
 	public void testInitChannelDifferentChannelSameUpdateCommitter() throws Exception {
@@ -59,11 +60,11 @@ public class NewClientInitializerTest {
 		cl.initChannel(newChannel);
 		
 		//Get Handlers for both channels
-		Mockito.verify(pipeline,Mockito.times(5)).addLast(handlerCapture.capture());
-		Mockito.verify(pipeline,Mockito.times(5)).addLast(newChannelCaptor.capture());
+		Mockito.verify(pipeline,Mockito.times(1)).addLast(Mockito.any(DefaultEventExecutorGroup.class),handlerCapture.capture());
+		Mockito.verify(pipeline,Mockito.times(1)).addLast(Mockito.any(DefaultEventExecutorGroup.class),newChannelCaptor.capture());
 	
 		//Make sure update committer is the same handler for both channels
-		assertTrue(handlerCapture.getAllValues().get(4) == newChannelCaptor.getAllValues().get(4));
+		assertTrue(handlerCapture.getAllValues().get(0) == newChannelCaptor.getAllValues().get(0));
 	}
 
 	private SocketChannel mockChannel(ChannelPipeline pipeline) {
