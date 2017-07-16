@@ -101,7 +101,7 @@ $ gradle clean builf
 #### Front-End
   - Direct initialization of Socket in Script while loading page. More page loading time. 
    We can use some event like document ready etc(Jquery??)
-  - There is no ordering of received topics. Client has to sort them again. While this is OK for 20 topics, we can change TOPTOPICS message to preserve ordering
+  - Ordering of received top topics is done on client side. This may be done on server side
   - Voting and thus triggered top topics order change is not so visual/observable to Naked-Eye immediately
   - Unit tests for JavaScript 
 
