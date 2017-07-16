@@ -23,9 +23,10 @@ public class UpdateCommitterTest {
 		
 	@Before
 	public void setup() {
-		repo = Mockito.mock(TopicRepo.class);
 		//Prepare pipeline with update committer
-		UpdateCommitter uc = new UpdateCommitter(repo);
+		UpdateCommitter uc = new UpdateCommitter();
+		repo = Mockito.mock(TopicRepo.class);
+		uc.topicRepo = repo;
 		ec = new EmbeddedChannel(uc);
 	}
 	
@@ -38,7 +39,7 @@ public class UpdateCommitterTest {
 		//Make sure,topic repo is updated
 		Mockito.verify(repo,Mockito.times(1)).addTopic(newTopic.getName());
 		//Make sure, it gets top topics and send message
-		Mockito.verify(repo,Mockito.times(1)).getTopTopics(Mockito.anyInt());
+		Mockito.verify(repo,Mockito.times(1)).getTopTopics();
 		//Make sure no other method is called
 		Mockito.verifyNoMoreInteractions(repo);
 	}
@@ -52,7 +53,7 @@ public class UpdateCommitterTest {
 		//Make sure,topic repo is updated
 		Mockito.verify(repo,Mockito.times(1)).upvoteTopic(newTopic.getName());
 		//Make sure, it gets top topics and send message
-		Mockito.verify(repo,Mockito.times(1)).getTopTopics(Mockito.anyInt());
+		Mockito.verify(repo,Mockito.times(1)).getTopTopics();
 		//Make sure no other method is called
 		Mockito.verifyNoMoreInteractions(repo);
 	}
@@ -65,8 +66,6 @@ public class UpdateCommitterTest {
 		
 		//Make sure,topic repo is updated
 		Mockito.verify(repo,Mockito.times(1)).downvoteTopic(newTopic.getName());
-		//Make sure, it gets top topics and send message
-		Mockito.verify(repo,Mockito.times(1)).getTopTopics(Mockito.anyInt());
 		//Make sure no other method is called
 		Mockito.verifyNoMoreInteractions(repo);
 	}

@@ -13,10 +13,9 @@ import java.util.List;
 public interface TopicRepo {
 
 	/**
-	 * Returns top n topics ordered by upvotes desc 
-	 * @param n
+	 * Returns top topics 
 	 */
-	public List<VotedTopic> getTopTopics(int n);
+	public List<VotedTopic> getTopTopics();
 	
 	
 	/**

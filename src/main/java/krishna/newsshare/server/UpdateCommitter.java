@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import krishna.newsshare.datastructure.TopicRepo;
+import krishna.newsshare.datastructure.TopicRepoImpl;
 import krishna.newsshare.datastructure.Update;
 import krishna.newsshare.datastructure.Update.UpdateType;
 import krishna.newsshare.datastructure.VotedTopic;
@@ -31,7 +32,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	private static Logger log  = LoggerFactory.getLogger(UpdateCommitter.class);
 	private static final int NO_OF_TOPICS = 20;
-	private TopicRepo topicRepo;
+	TopicRepo topicRepo;
 	
 	/**
 	 * Channelgroup encapsualtes all existing WS connections.
@@ -39,8 +40,8 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	 */
 	private ChannelGroup sockets;
 	
-	public UpdateCommitter(TopicRepo tr) {
-		this.topicRepo = tr;
+	public UpdateCommitter() {
+		this.topicRepo = new TopicRepoImpl(NO_OF_TOPICS);
 		//This executor is used to notify futures of actions on channelgroup.
 		//Nobody is listening,so it's ok to use this default executor
 		this.sockets = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -52,12 +53,13 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 			throws Exception {
 		if(msg.getUpdateType() == UpdateType.TOPIC) {
 			topicRepo.addTopic(msg.getName());
+			sendTopTopics();
 		} else if(msg.getUpdateType() == UpdateType.UPVOTE) {
 			topicRepo.upvoteTopic(msg.getName());
+			sendTopTopics();
 		} else if(msg.getUpdateType() == UpdateType.DOWNVOTE) {
 			topicRepo.downvoteTopic(msg.getName());
 		}
-		sendTopTopics();
 	}
 
 
@@ -76,14 +78,14 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	}
 	
 	private void sendFirstMessage(Channel ch) {
-		List<VotedTopic> list = topicRepo.getTopTopics(NO_OF_TOPICS);
+		List<VotedTopic> list = topicRepo.getTopTopics();
 		String json = convertToJson(list);
 		TextWebSocketFrame frame = new TextWebSocketFrame(json);
 		ch.writeAndFlush(frame);
 	}
 	
 	private void sendTopTopics() {
-		List<VotedTopic> list = topicRepo.getTopTopics(NO_OF_TOPICS);
+		List<VotedTopic> list = topicRepo.getTopTopics();
 		String json = convertToJson(list);
 		log.trace("Sending " + json);
 		TextWebSocketFrame frame = new TextWebSocketFrame(json);

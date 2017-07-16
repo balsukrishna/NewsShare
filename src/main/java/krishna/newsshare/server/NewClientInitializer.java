@@ -37,7 +37,7 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
 	
 	public NewClientInitializer() {
 		indexContent = readIndexPage();
-		updateCommitter = new UpdateCommitter(new TopicRepoImpl());
+		updateCommitter = new UpdateCommitter();
 		singleThreadExGroup = new DefaultEventExecutorGroup(1);
 	}
 	
