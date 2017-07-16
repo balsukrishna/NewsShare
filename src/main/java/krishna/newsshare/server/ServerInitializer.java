@@ -8,8 +8,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 
 /**
  * Initializes the server on port 8080
@@ -22,13 +20,20 @@ public class ServerInitializer {
 
     public static void main(String[] args) throws Exception {
 
+    	//Boss group responsible for listening connections
+    	//Use single thread
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        //Worker group responsible for handling all the logic,io for
+        //established connections
+        
+        //Use twice the number of cores
+        int cores = Runtime.getRuntime().availableProcessors();
+        EventLoopGroup workerGroup = new NioEventLoopGroup(cores *2);
+    
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
-             .handler(new LoggingHandler(LogLevel.INFO))
              .childHandler(new NewClientInitializer());
 
             Channel ch = b.bind(PORT).sync().channel();

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import krishna.newsshare.datastructure.TopicRepoImpl;
 
 import org.slf4j.Logger;
@@ -17,6 +16,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
 
 /**
  * This is the first handler that is triggered for every new connection. <br>
@@ -33,10 +33,12 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
 	private static final String INDEX_PAGE = "src/main/javascript/index.html";
 	private String indexContent;
 	private UpdateCommitter updateCommitter;
+	private DefaultEventExecutorGroup singleThreadExGroup;
 	
 	public NewClientInitializer() {
 		indexContent = readIndexPage();
 		updateCommitter = new UpdateCommitter(new TopicRepoImpl());
+		singleThreadExGroup = new DefaultEventExecutorGroup(1);
 	}
 	
 	@Override
@@ -46,7 +48,7 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new RequestUpgrader(indexContent));
         pipeline.addLast(new WSFrameHandler());
-        pipeline.addLast(updateCommitter);
+        pipeline.addLast(singleThreadExGroup,updateCommitter);
     }
 	
     private String readIndexPage() {
@@ -63,7 +65,7 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
         	String fileAsString = sb.toString(); 
         	return fileAsString;
     	} catch(Exception ex) {
-    		log.error("Error while reading index page",ex);
+    		log.error("Error while reading index page. Expected at {}",INDEX_PAGE,ex);
     	} finally {
     		if(buf != null) {
     			try {

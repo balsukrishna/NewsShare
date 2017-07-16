@@ -41,6 +41,8 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	
 	public UpdateCommitter(TopicRepo tr) {
 		this.topicRepo = tr;
+		//This executor is used to notify futures of actions on channelgroup.
+		//Nobody is listening,so it's ok to use this default executor
 		this.sockets = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 	}
 	
