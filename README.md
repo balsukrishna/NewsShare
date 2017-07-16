@@ -23,9 +23,9 @@ $ gradle clean builf
    + [Mockito](https://github.com/mockito/mockito) for mocking dependencies
   
 ### Architecture
-   **Client Server Interaction**
-    - Browsing `/` initates a websocket connection to `/voteFeed`
-    - Two types of messages exchanged between server and client  
+   - **Client Server Interaction**  
+    - Browsing `/` initates a websocket connection to `/voteFeed`  
+    - Two types of messages exchanged between server and client    
     
        + UPDATE: Sent from Client to Server
             ```
@@ -53,15 +53,14 @@ $ gradle clean builf
              +---------+   UPDATE           +---------+
 
 
-            ```
-        
-   **Server Architecture**  
-  
-      - Netty is a Non blocking event driven Framwork. The key features are  
-         * EventLoop: EventLoop reads incoming data and trigger events to registered ChannelHandlers  
-         * ChanneHandlers: ChannelHandlers should perform business logic and trigger events/write to channel as required  
-         * It gurantees one client/channel is handled by one eventloop(one thread) at any point of time  
-         * Current List of Handlers is like this  
+            ```  
+      
+    - **Server Architecture**  
+      + Netty is a Non blocking event driven Framwork. The key features are
+      + EventLoop: EventLoop reads incoming data and trigger events to registered ChannelHandlers  
+      + ChanneHandlers: ChannelHandlers should perform business logic and trigger events/write to channel as required  
+      + It gurantees one client/channel is handled by one eventloop(one thread) at any point of time  
+      + Current List of Handlers is like this  
          
 
             ```
