@@ -109,8 +109,10 @@ $ gradle clean builf
   - There are lot of fields hard coded, top topics, max topic length,WS request URI, index page loc etc. Create Config
   - Character encoding while serializing,reading index page etc is left to chance. Fix it  
   - Missing Unit Test for HttpRequest Handler
+  - Current logic always sends top topics  upon new topic and upvote without really checking whether they really changed or not.
+    This can be improved
   - Have to really profile performance of using concurrent data structure/vs context switching overhead to a single thread executor while updating TopicRepo to make sure our decision is optimal
-   
 
+  
 
    
