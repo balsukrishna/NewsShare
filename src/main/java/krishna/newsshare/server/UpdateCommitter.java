@@ -64,7 +64,7 @@ public class UpdateCommitter extends SimpleChannelInboundHandler<Update> {
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
 			throws Exception {
-		if(evt instanceof RequestUpgrader.NewWSEvent) {
+		if(evt instanceof HttpRequestHandler.NewWSEvent) {
 			//Add this socket to channelgroup
 			log.info("Receied new WS Connection {}.Sending top topics",ctx.channel());
 			sockets.add(ctx.channel());

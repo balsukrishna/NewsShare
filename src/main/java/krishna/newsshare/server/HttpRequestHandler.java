@@ -25,7 +25,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 
 /**
- * A new Request Upgrader is added to every channel's pipeline <br>
+ * A new Request Handler is added to every channel's pipeline <br>
  * <b>Responsibility:</b>: <br>
  *  1. For HomePage uri,Return a html containing index <br> 
  *  2. For voteFeed uri(expected to have upgrade header),upgrage to WS Connection,
@@ -34,13 +34,13 @@ import static io.netty.handler.codec.http.HttpVersion.*;
  * @author krishna
  *
  */
-public class RequestUpgrader extends SimpleChannelInboundHandler<FullHttpRequest> {
-	private static final Logger log = LoggerFactory.getLogger(RequestUpgrader.class);
+public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+	private static final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 	
 	private static final String WS_PATH = "/voteFeed";
 
     private String index;
-    public RequestUpgrader(String indexContent) {
+    public HttpRequestHandler(String indexContent) {
     	this.index = indexContent;
 	}
 

@@ -40,7 +40,7 @@ public class NewClientInitializerTest {
 		List<ChannelHandler> handlers = handlerCapture.getAllValues();
 		assertTrue(handlers.get(0) instanceof HttpServerCodec);
 		assertTrue(handlers.get(1) instanceof HttpObjectAggregator);
-		assertTrue(handlers.get(2) instanceof RequestUpgrader);
+		assertTrue(handlers.get(2) instanceof HttpRequestHandler);
 		assertTrue(handlers.get(3) instanceof WSFrameHandler);
 		assertTrue(handlers.get(4) instanceof UpdateCommitter);
 	}

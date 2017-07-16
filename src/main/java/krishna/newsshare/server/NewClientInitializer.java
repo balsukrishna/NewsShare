@@ -46,7 +46,7 @@ public class NewClientInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
-        pipeline.addLast(new RequestUpgrader(indexContent));
+        pipeline.addLast(new HttpRequestHandler(indexContent));
         pipeline.addLast(new WSFrameHandler());
         pipeline.addLast(singleThreadExGroup,updateCommitter);
     }
