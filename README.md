@@ -18,7 +18,7 @@ $ gradle clean builf
 ### Dependencies
  Core Dependencies
    + [Netty](http://netty.io/) a NIO framework is used to write server application
-   + [Gson](https://github.com/google/gson) is used to serialize and desirialize JSON Strings to Java POJO
+   + [Gson](https://github.com/google/gson) is used to serialize and desirialize JSON Strings to Java POJO  
  Test Dependencies
    + [Mockito](https://github.com/mockito/mockito) for mocking dependencies
   
