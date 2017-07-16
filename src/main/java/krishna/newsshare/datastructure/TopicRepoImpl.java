@@ -22,7 +22,7 @@ public class TopicRepoImpl implements TopicRepo {
 	@Override
 	public List<VotedTopic> getTopTopics(int n) {
 		ArrayList<VotedTopicImpl> votedTopics = new ArrayList<>(topicMap.values());
-		Collections.sort(votedTopics);
+		Collections.sort(votedTopics,Collections.reverseOrder());
 		
 		List<VotedTopic> topTopics = new ArrayList<>();
 		int i = 0;
